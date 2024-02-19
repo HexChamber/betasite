@@ -1,0 +1,122 @@
+{% extends "bulma/base.html" %}
+{% load static bulma_tags %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <style>
+        .indented {
+            text-indent: 30px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+{% endblock %}
+{% block header %}
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'dashboard' %}">BetaSite</a>
+            <div class="navbar-burger" data-target="navbarMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="navbar-menu" id="navbarMenu">
+            <div class="navbar-start">
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">Menu</a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="#">Menu item</a>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-end">
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <div class="field">
+                    <p class="control">
+                        <input type="submit" class="button is-danger is-outlined" value="Logout">
+                    </p>
+                </div>
+            </form>
+            {% else %}
+            <div class="field is-grouped">
+                <p class="control">
+                    <a class="button is-primary is-inverted is-outlined" href="{% url 'login' %}">Login</a>
+                </p>
+                <p class="control">
+                    <a class="button is-dark" href="{% url 'register' %}">Register</a>
+                </p>
+            </div>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+{% block hero %}
+<section class="hero is-primary">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            {% block banner %}
+            {% endblock %}
+        </div>
+    </div>
+    {% if request.user.is_authenticated %}
+    <div class="hero-foot has-text-centered">
+        <div class="tabs is-centered is-boxed has-text-centered">
+            <ul class="has-text-centered">
+                <li{% if section == "dashboard" %} class="is-active"{% endif %}>
+                    <a href="{% url 'dashboard' %}">
+                        <span class="icon is-small"><i class="fa-solid fa-gauge"></i></span>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li{% if section == "images" %} class="is-active"{% endif %}>
+                    <a>
+                        <span class="icon is-small"><i class="fa-solid fa-image"></i></span>
+                        <span>Images</span>
+                    </a>
+                </li>
+                <li{% if section == "people" %} class="is-active"{% endif %}>
+                    <a>
+                        <span class="icon is-small"><i class="fa-solid fa-users"></i></span>
+                        <span>People</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
+{% block content_area %}
+<div class="columns is-centered">
+    <div class="column is-10">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
+{% block modal %}{% endblock %}
+{% block footer %}
+<footer class="footer">
+    <div class="container">
+        <div class="content has-text-centered">
+            <p>
+                <strong>BetaSite</strong> built by <a href="https://github.com/HexChamber">HexChamber DEV</a>.
+            </p>
+            <p>
+                Source code licensed by <a href="https://opensource.org/licenses/mit-license.php">MIT License</a>
+            </p>
+            <p>
+                &copy;2024
+            </p>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+{% block javascript %}
+    {% block extra_javascript %}{% endblock %}
+{% endblock %}

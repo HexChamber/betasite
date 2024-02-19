@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load bulma_tags %}
+{% block title %}Login{% endblock %}
+{% block banner %}
+<h2 class="title">Login</h2>
+<p class="subtitle">Existing users may login below:</p>
+{% endblock %}
+{% block content %}
+{% if form.errors %}
+<div class="notification is-danger">
+    <button class="delete"></button>
+    <div class="content">
+        <p class="indented">Your username and password did not match our records. Please try again.</p>
+    </div>
+</div>
+{% endif %}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <form action="{% url 'login' %}" method="post">
+                {{ form|bulma }}
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-block is-fullwidth">Login</button>
+                    </div>
+                </div>
+            </form>
+            <div class="block">
+                <a href="{% url 'password_reset' %}">Forgot your password?</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

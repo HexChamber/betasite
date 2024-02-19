@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load bulma_tags site_tags static %}
+{% block title %}Dashboard{% endblock %}
+{% block banner %}
+<h2 class="title">Welcome {{ request.user.first_name|default:request.user.username }}!</h2>
+<p class="subtitle">to your personal <strong>Dashboard</strong></p>
+{% endblock %}
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-5">
+        <div class="menu-box">
+            <h4 class="menu-label">Settings</h4>
+            <ul class="menu-list">
+                <li><a href="{% url 'password_change' %}">Change your password</a></li>
+                <li><a href="{% url 'edit' %}">Edit your Profile</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="column is-5">
+        <div class="card" id="userProfileCard">
+            <div class="card-image">
+                <figure class="image is-4by3 js-modal-trigger" id="profilePhotoTrigger" data-target="profilePhotoModal">>
+                    <img src="{% static 'img/no_image.png' %}" alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="card-content js-modal-trigger" data-target="profileInfoModal">
+                <div class="media">
+                    <div class="media-left">
+                        <figure class="image is-48x48">
+                            <img src="{% static 'img/no_image.png' %}"
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <p class="title is-4">{{ request.user.get_full_name }}</p>
+                        <p class="subtitle is-6">@{{ request.user.username }}</p>
+                    </div>
+                </div>
+
+                <div class="content">
+                    {{ request.user.profile.about_me|indented|truncatewords_html:30 }}
+                    <p class="has-text-weight-light">(Click for more)</p>
+                </div>
+                <time class="has-text-weight-light is-size-7 is-italic">11:09 PM - 1 Jan 2024</time>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block modal %}
+<div class="modal" id="profileInfoModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-car-title">{{ request.user.get_full_name }}</p>
+            <p class="subtitle is-7">@{{ request.user.username }}</p>
+            <button class="delete"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="content">
+                {{ request.user.profile.about_me|indented }}
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <a class="button is-primary" href="{% url 'edit' %}">Edit profile</a>
+            <button class="modal-close is-dark is-outlined" type="button" id="closeContentModal">Close</button>
+        </footer>
+    </div>
+</div>
+
+<div class="modal" id="profilePhotoModal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <p class="image is-4by3">
+            <img src="{% static 'img/no_image.png' %}">
+        </p>
+    </div>
+    <div class="buttons is-centered">
+        <a class="button is-primary" href="{% url 'edit' %}">Edit profile</a>
+        <button class="modal-close is-dark is-outlined" type="button" id="closeImageModal">Close</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function openModal($el) {
+            $el.classList.add('is-active');
+        }
+
+        function closeModal($el) {
+            $el.classList.remove('is-active');
+        }
+
+        function closeAllModals() {
+            (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+                closeModal($modal);
+            });
+        }
+
+        (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+            const modal = $trigger.dataset.target;
+            const $target = document.getElementById(modal);
+
+            $trigger.addEventListener('click', () => {
+                openModal($target);
+            });
+        });
+
+        (document.querySelectorAll('.modal-background, .modal-close, .modal-card-head .delete') || []).forEach(($close) => {
+            const $target = $close.closest('.modal');
+
+            $close.addEventListener('click', () => {
+                closeModal($target);
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if(event.key === 'Escape') {
+                closeAllModals();
+            }
+        });
+    });
+</script>
+{% endblock %}

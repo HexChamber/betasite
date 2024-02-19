@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Logged out{% endblock %}
+{% block banner %}
+<h2 class="title">Logged out</h2>
+<p class="subtitle">Your account has been signed out</p>
+{% endblock %}
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-two-thirds">
+        <div class="message is-info">
+            <div class="message-body">
+                <div class="content">
+                    <p class="indented">You have been successfully signed out.</p>
+                    <p>To log back in, return to the login page via the <strong>button</strong> below.</p>
+                </div>
+            </div>
+        </div>
+        <div class="buttons is-centered">
+            <a class="button is-link is-block is-fullwidth" href="{% url 'login' %}">Return to login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

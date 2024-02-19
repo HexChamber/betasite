@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load bulma_tags %}
+{% block title %}Create an account{% endblock %}
+{% block banner %}
+<h2 class="title">Create an account</h2>
+<p class="subtitle">New users may create their account below:</p>
+{% endblock %}
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <div class="box">
+            <form method="post">
+                {{ user_form|bulma }}
+                {% csrf_token %}
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-block is-fullwidth">Create account</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
