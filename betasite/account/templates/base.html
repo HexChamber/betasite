@@ -7,11 +7,20 @@
         .indented {
             text-indent: 30px;
         }
+        .social .is-facebook {
+            background: #3b5399;
+        }
+        .social .is-twitter {
+            background: #00cffa;
+        }
+        .social .is-google {
+            background: #de1710;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 {% endblock %}
 {% block header %}
-<nav class="navbar">
+<nav class="navbar is-spaced">
     <div class="container">
         <div class="navbar-brand">
             <a class="navbar-item" href="{% url 'dashboard' %}">BetaSite</a>

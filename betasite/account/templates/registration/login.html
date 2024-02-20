@@ -30,6 +30,25 @@
             <div class="block">
                 <a href="{% url 'password_reset' %}">Forgot your password?</a>
             </div>
+            <div class="block">
+                <div class="field is-grouped is-fullwidth">
+                    <p class="control">
+                        <a class="button is-facebook" href="{% url 'social:begin' 'facebook' %}">
+                            <span class="icon is-medium"><i class="fa-brands fa-facebook"></i></span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-twitter" href="{% url 'social:begin' 'twitter' %}">
+                            <span class="icon is-medium"><i class="fa-brands fa-twitter"></i></span>
+                        </a>
+                    </p>
+                    <p class="control">
+                        <a class="button is-google" href="#">
+                            <span class="icon is-medium"><i class="fa-brands fa-google"></i></span>
+                        </a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
