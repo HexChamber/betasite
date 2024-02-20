@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static bulma_tags %}
+{% block title %}Bookmark an image{% endblock %}
+{% block banner %}
+<h2 class="title">Bookmark an image</h2>
+{% endblock %}
+{% block content %}
+<div class="columns is-centered is-vcentered">
+    <div class="column is-half">
+        <div class="box">
+            <figure class="image is-square">
+                <img src="{{ request.GET.url }}">
+            </figure>
+        </div>
+    </div>
+    <div class="column is-half">
+        <div class="box">
+            <form method="post">
+                {{ form|bulma }}
+                {% csrf_token %}
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-block is-fullwidth">Save image</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
