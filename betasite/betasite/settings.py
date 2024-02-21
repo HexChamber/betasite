@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'bulma',
     'social_django',
     'django_extensions',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [

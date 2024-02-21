@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static bulma_tags site_tags %}
+{% block title %}{{ image.title }}{% endblock %}
+{% block banner %}
+<h2 class="title is-2">{{ image.title }}</h2>
+<p class="subtitle is-italic has-text-weight light">{{ image.user.get_full_name }} shared at {{ image.created }}</p>
+{% endblock %}
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-half">
+
+        <figure class="image is-4by3 js-modal-trigger" data-target="imageModal">
+            {% load thumbnail %}
+            <a href="{{ image.image.url }}">
+                <img src="{% thumbnail image.image 300x0 %}">
+            </a>
+
+    </div>
+    <div class="column is-half">
+            <nav class="level">
+                <div class="level-left">
+                </div>
+                <div class="level-right">
+                    <div class="level-item box has-background-dark has-text-white has-text-centered">
+                        {% with total_likes=image.users_like.count %}
+                        <p class="heading has-text-white">Like{{ total_likes|pluralize }}</p>
+                        <p class="title has-text-white">{{ total_likes }}</p>
+                        {% endwith %}
+                    </div>
+                </div>
+            </nav>
+            <hr>
+            <div class="box">
+                <div class="content block">
+                    {{ image.description|markdown }}
+                </div>
+            </div>
+        <div class="dropdown">
+            <div class="dropdown-trigger">
+                <button class="button is-info is-block is-fullwidth" aria-haspopup="true" aria-controls="dropdown-menu">
+                    <span>People who like this</span>
+                    <span class="icon is-small">
+                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    </span>
+                </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                <div class="dropdown-content">
+                    {% for user in image.users_like.all %}
+                    <a class="dropdown-item" href="#">
+                        <article class="media">
+                            <figure class="media-left">
+                                <p class="image is-64x64">
+                                    <img src="{% if user.profile.photo  %}{% thumbnail user.profile.photo 64x64 %}{% else %}{% static 'css/no_image.css' %}{% endif %}">
+                                </p>
+                            </figure>
+                            <div class="media-content">
+                                <p class="title is-4">{{ user.get_full_name }}</p>
+                                <p class="subtitle is-6">@{{ user.username}}</p>
+                            </div>
+                        </article>
+                    </a>
+                    {% empty %}
+                    <!-- This empty value is quite nice -->
+                    <div class="dropdown-item message is-dark">
+                        <div class="message-body">
+                            <div class="content indented is-italic">
+                                Nobody has like this image yet.
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block modal %}
+<div class="modal" id="imageModal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <figure class="image is-4by3">
+            <a href="{{ image.image.url }}">
+            <img src="{% thumbnail image.image 600x0 quality=100 %}">
+            </a>
+        </figure>
+    </div>
+</div>
+{% endblock %}
+{% block extra_javascript %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function openModal($el) {
+            $el.classList.add('is-active');
+        }
+
+        function closeModal($el) {
+            $el.classList.remove('is-active');
+        }
+
+        function closeAllModals() {
+            (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+                closeModal($modal);
+            });
+        }
+
+        (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+            const modal = $trigger.dataset.target;
+            const $target = document.getElementById(modal);
+
+            $trigger.addEventListener('click', () => {
+                openModal($target);
+            });
+        });
+
+        (document.querySelectorAll('.modal-background', '.modal-close') || []).forEach(($close) => {
+            const $target = $close.closest('.modal');
+
+            $close.addEventListener('click', () => {
+                closeModal($target);
+
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeAllModals();
+            }
+        });
+    });
+</script>
+{% endblock %}
