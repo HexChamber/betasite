@@ -1,0 +1,18 @@
+<div class="columns is-centered">
+    <div class="column is-two-thirds">
+        {% load thumbnail %}
+        {% for image in images %}
+        <div class="card">
+            <div class="card-header">
+                <a class="card-header-title is-size-5" href="{{ image.get_absolute_url }}">{{ image.title }}</a>
+            </div>
+            <div class="card-image">
+                <figure class="image is-4by3">
+                <a href="{{ image.get_absolute_url }}">
+                    <img src="{% thumbnail image.image 300x0 autocrop %}">
+                </a>
+                </figure>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
