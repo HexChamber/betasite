@@ -2,67 +2,101 @@
 {% load bulma_tags site_tags static %}
 {% block title %}Dashboard{% endblock %}
 {% block banner %}
-<h2 class="title">Welcome {{ request.user.first_name|default:request.user.username }}!</h2>
-<p class="subtitle">to your personal <strong>Dashboard</strong></p>
+<h2 class="title">Welcome {{ request.user.first_name|default:request.user.username }}</h2>
+<p class="subtitle">to your <strong>Dashboard</strong></p>
 {% endblock %}
+
 {% block content %}
-<div class="columns is-centered">
-    <div class="column is-5">
-        <div class="menu-box">
-            <h4 class="menu-label">Settings</h4>
-            <ul class="menu-list">
-                <li><a href="{% url 'password_change' %}">Change your password</a></li>
-                <li><a href="{% url 'edit' %}">Edit your Profile</a></li>
-            </ul>
+<div class="box has-background-primary">
+<div class="tile is-ancestor">
+    <div class="tile is-4 is-vertical is-parent">
+        <!-- <div class="tile is-child menu box"> -->
+        <!--     <h4 class="menu-label">Settings</h4> -->
+        <!--     <ul class="menu-list"> -->
+        <!--         <li><a href="{% url 'edit' %}">Edit your Profile</a></li> -->
+        <!--         <li><a href="{% url 'password_change' %}">Change your password</a></li> -->
+        <!--     </ul> -->
+        <!-- </div> -->
+        <div class="tile is-child">
+            <div class="menu box">
+                <h4 class="menu-label">Settings</h4>
+                <ul class="menu-list">
+                    <li><a href="{% url 'edit' %}">Edit your profile</a></li>
+                    <li><a href="{% url 'password_change' %}">Change your password</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-    <div class="column is-5">
-        <div class="card" id="userProfileCard">
-            <div class="card-image">
-                <figure class="image is-4by3 js-modal-trigger" id="profilePhotoTrigger" data-target="profilePhotoModal">>
-                    <img src="{% static 'img/no_image.png' %}" alt="Placeholder image">
-                </figure>
+    <div class="tile is-5">
+        <div class="tile is-vertical is-parent">
+            <div class="tile is-child">
+                <nav class="level is-mobile">
+                    {% with total_images_created=request.user.images_created.count %}
+                    <div class="level-item box has-background-dark has-text-white has-text-centered">
+                        <div>
+                            <p class="heading has-text-white">image{{ total_images_created|pluralize }}</p>
+                            <p class="title has-text-white">{{ total_images_created }}</p>
+                        </div>
+                    </div>
+                    {% endwith %}
+                    <div class="level-item box has-background-dark has-text-white has-text-centered">
+                        <div>
+                            <p class="heading">Bookmarklet</p>
+                            <div class="buttons is-centered">
+                                <a href="javascript:{% include 'bookmarklet_launcher.js' %}" class="button is-fullwidth is-primary">Bookmark It</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
             </div>
-            <div class="card-content js-modal-trigger" data-target="profileInfoModal">
-                <div class="media">
-                    <div class="media-left">
-                        <figure class="image is-48x48">
-                            <img src="{% static 'img/no_image.png' %}"
-                        </figure>
-                    </div>
-                    <div class="media-content">
-                        <p class="title is-4">{{ request.user.get_full_name }}</p>
-                        <p class="subtitle is-6">@{{ request.user.username }}</p>
-                    </div>
-                </div>
+            <div class="tile is-child">
+                <div class="card" is="userProfileCard">
+                    <div class="card-content"
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-64x64 js-modal-trigger" data-target="profilePhotoModal">
+                                    <img class="is-rounded" src="{% static 'img/no_image.png' %}" alt="Placeholder image">
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-4">{{ request.user.get_full_name }}</p>
+                                <p class="subtitle is-6">@{{ request.user.username }}</p>
+                            </div>
+                        </div>
 
-                <div class="content">
-                    {{ request.user.profile.about_me|indented|truncatewords_html:30 }}
-                    <p class="has-text-weight-light">(Click for more)</p>
+                        <div class="content block indented m-auto p-3">
+                            {{ request.user.profile.about_me|markdown|truncatewords_html:30 }}
+                            <a class="is-italic has-text-weight-semibold is-size-7 js-modal-trigger" data-target="profileInfoModal">[Click for more]</a>
+                        </div>
+                        <time class="has-text-weight-light is-size-7">{% now "SHORT_DATETIME_FORMAT" %}</time>
+                    </div>
                 </div>
-                <time class="has-text-weight-light is-size-7 is-italic">11:09 PM - 1 Jan 2024</time>
             </div>
         </div>
     </div>
 </div>
+</div>
 {% endblock %}
+
 {% block modal %}
 <div class="modal" id="profileInfoModal">
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-car-title">{{ request.user.get_full_name }}</p>
-            <p class="subtitle is-7">@{{ request.user.username }}</p>
-            <button class="delete"></button>
+            <div class="modal-card-title">
+                <p class="title is-5">{{ request.user.get_full_name }}</p>
+                <p class="subtitle is-7">@{{ request.user.username }}</p>
+            </div>
+            <button class="delete is-right"></button>
         </header>
-        <section class="modal-card-body">
-            <div class="content">
-                {{ request.user.profile.about_me|indented }}
+         <section class="modal-card-body">
+            <div class="content indented">
+                {{ request.user.profile.about_me|markdown }}
             </div>
         </section>
         <footer class="modal-card-foot">
-            <a class="button is-primary" href="{% url 'edit' %}">Edit profile</a>
-            <button class="modal-close is-dark is-outlined" type="button" id="closeContentModal">Close</button>
+            <a class="button is-primary is-large" href="{% url 'edit' %}">Edit profile</a>
+            <button class="modal-close button is-dark is-outlined" type="button"></button>
         </footer>
     </div>
 </div>
@@ -70,13 +104,13 @@
 <div class="modal" id="profilePhotoModal">
     <div class="modal-background"></div>
     <div class="modal-content">
-        <p class="image is-4by3">
+        <figure class="image is-4by3">
             <img src="{% static 'img/no_image.png' %}">
-        </p>
-    </div>
-    <div class="buttons is-centered">
-        <a class="button is-primary" href="{% url 'edit' %}">Edit profile</a>
-        <button class="modal-close is-dark is-outlined" type="button" id="closeImageModal">Close</button>
+        </figure>
+        <div class="buttons is-centered">
+            <a class="button is-primary" href="{% url 'edit' %}">Edit profile</a>
+            <button class="button modal-close is-dark is-outlined" type="button"></button>
+        </div>
     </div>
 </div>
 {% endblock %}

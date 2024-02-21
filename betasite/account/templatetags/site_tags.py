@@ -1,5 +1,7 @@
 from django import template
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+import markdown
 
 
 
@@ -15,3 +17,9 @@ def indent_text(text, classes=''):
         text += '</p>'
 
     return format_html(text)
+
+
+
+@register.filter(name='markdown')
+def markdown_format(text):
+    return mark_safe(markdown.markdown(text))
