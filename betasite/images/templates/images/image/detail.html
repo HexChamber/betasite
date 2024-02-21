@@ -24,7 +24,7 @@
                     <div class="level-item box has-background-dark has-text-white has-text-centered">
                         {% with total_likes=image.users_like.count %}
                         <p class="heading has-text-white">Like{{ total_likes|pluralize }}</p>
-                        <p class="title has-text-white">{{ total_likes }}</p>
+                        <p class="title has-text-white" id="likeCounter">{{ total_likes }}</p>
                         {% endwith %}
                     </div>
                 </div>
@@ -35,44 +35,58 @@
                     {{ image.description|markdown }}
                 </div>
             </div>
-        <div class="dropdown">
-            <div class="dropdown-trigger">
-                <button class="button is-info is-block is-fullwidth" aria-haspopup="true" aria-controls="dropdown-menu">
-                    <span>People who like this</span>
-                    <span class="icon is-small">
-                        <i class="fas fa-angle-down" aria-hidden="true"></i>
-                    </span>
-                </button>
+        <nav class="level">
+            <div class="level-item">
+                {% with users_like=image.users_like.all %}
+                <a class="button is-primary is-block is-fullwidth like" href="#" data-id="{{ image.id }}" data-action="{% if request.user in users_like %}un{% endif %}like">
+                    {% if request.user not in users_like %}
+                        Like
+                    {% else %}
+                        Unlike
+                    {% endif %}
+                </a>
+                {% endwith %}
             </div>
-            <div class="dropdown-menu" id="dropdown-menu">
-                <div class="dropdown-content">
-                    {% for user in image.users_like.all %}
-                    <a class="dropdown-item" href="#">
-                        <article class="media">
-                            <figure class="media-left">
-                                <p class="image is-64x64">
-                                    <img src="{% if user.profile.photo  %}{% thumbnail user.profile.photo 64x64 %}{% else %}{% static 'css/no_image.css' %}{% endif %}">
-                                </p>
-                            </figure>
-                            <div class="media-content">
-                                <p class="title is-4">{{ user.get_full_name }}</p>
-                                <p class="subtitle is-6">@{{ user.username}}</p>
-                            </div>
-                        </article>
-                    </a>
-                    {% empty %}
-                    <!-- This empty value is quite nice -->
-                    <div class="dropdown-item message is-dark">
-                        <div class="message-body">
-                            <div class="content indented is-italic">
-                                Nobody has like this image yet.
+
+            <div class="dropdown level-item">
+                <div class="dropdown-trigger">
+                    <button class="button is-light is-block is-fullwidth" aria-haspopup="true" aria-controls="dropdown-menu">
+                        <span>People who like this</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu">
+                    <div class="dropdown-content">
+                        {% for user in image.users_like.all %}
+                        <a class="dropdown-item" href="#">
+                            <article class="media">
+                                <figure class="media-left">
+                                    <p class="image is-64x64">
+                                        <img src="{% if user.profile.photo  %}{% thumbnail user.profile.photo 64x64 %}{% else %}{% static 'css/no_image.css' %}{% endif %}">
+                                    </p>
+                                </figure>
+                                <div class="media-content">
+                                    <p class="title is-4">{{ user.get_full_name }}</p>
+                                    <p class="subtitle is-6">@{{ user.username}}</p>
+                                </div>
+                            </article>
+                        </a>
+                        {% empty %}
+                        <!-- This empty value is quite nice -->
+                        <div class="dropdown-item message is-dark">
+                            <div class="message-body">
+                                <div class="content indented is-italic">
+                                    Nobody has like this image yet.
+                                </div>
                             </div>
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-        </div>
+             </div>
+        </nav>
     </div>
 </div>
 {% endblock %}
@@ -128,6 +142,46 @@
                 closeAllModals();
             }
         });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        console.log("DOM Loaded");
+        const url = '{% url "images:like" %}';
+        var options = {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin'
+        }
+
+        document.querySelector('a.like')
+            .addEventListener('click', function(e){
+                e.preventDefault();
+                console.log("Like button clicked")
+                var likeButton = this;
+
+                var formData = new FormData();
+                formData.append('id', likeButton.dataset.id);
+                formData.append('action', likeButton.dataset.action);
+                options['body'] = formData;
+
+                fetch(url, options)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data['status'] === 'ok')
+                        {
+                            var previousAction = likeButton.dataset.action;
+                            var action = previousAction === 'like' ? 'unlike' : 'like';
+                            likeButton.dataset.action = action;
+
+                            var likeCount = document.querySelector('#likeCounter');
+                            var totalLikes = parseInt(likeCount.innerHTML);
+                            likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+                            likeButton.innerHTML = action;
+                        }
+                    });
+            });
     });
 </script>
 {% endblock %}
